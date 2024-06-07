@@ -12,7 +12,7 @@ Esta librería realiza el cálculo de la respuesta impulso de operadores fraccio
 - **Métodos de Conversión FIR a IIR**:
   - Padé: La peor aproximación en términos de precisión, pero la menos costosa computacionalmente y sin cota de error.
   - Shank: Calcula los coeficientes del numerador de forma óptima en el sentido cuadrático.
-  - Prony: Calcula los coeficientes del numerador y denominador, siendo el más costoso computacionalmente.
+  - Prony: Calcula los coeficientes del numerador y denominador en el sentido cuadratico, siendo el más costoso computacionalmente.
 
 ## Requisitos
 
