@@ -86,6 +86,7 @@ Volume 86, Issue 10,
 Pages 2567-2581,
 ISSN 0165-1684,
 <https://doi.org/10.1016/j.sigpro.2006.02.005.>
+
 <https://www.sciencedirect.com/science/article/pii/S0165168406000430>
 
 ## Requisitos
@@ -97,6 +98,6 @@ ISSN 0165-1684,
 Para utilizar esta librería, simplemente clona el repositorio y compila el archivo `main.cpp`.
 
 ```bash
-git clone <https://github.com/jafetrd/fractionalOrderFilter>
-cd <fractionalOrderFilter>
+git clone https://github.com/jafetrd/fractionalOrderFilter
+cd fractionalOrderFilter
 g++ -std=c++11 main.cpp -o main
