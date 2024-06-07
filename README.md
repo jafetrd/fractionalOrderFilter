@@ -77,7 +77,6 @@ Las contribuciones son bienvenidas. Por favor, abre un issue o envía un pull re
 
 # Bibliografia
 El codigo es una implementación de la representación matricial mostrada por: 
-
 Ramiro S. Barbosa, J.A. Tenreiro Machado, Manuel F. Silva,
 Time domain design of fractional differintegrators using least-squares,
 Signal Processing,
@@ -86,7 +85,6 @@ Volume 86, Issue 10,
 Pages 2567-2581,
 ISSN 0165-1684,
 <https://doi.org/10.1016/j.sigpro.2006.02.005.>
-
 <https://www.sciencedirect.com/science/article/pii/S0165168406000430>
 
 ## Requisitos
