@@ -1,20 +1,19 @@
 #include "fractionalOrderFilter.h"
 #include <cmath>
 #include <algorithm>
-#include <cstring> // Para memmove
 
 FractionalOrderFilter::FractionalOrderFilter(double orden, double periodo, double tipo) {
-     if (orden < MIN_ORDER || orden > MAX_ORDER || tipo < MIN_TYPE || tipo > MAX_TYPE) {
+     if (orden < _MIN_ORDER || orden > _MAX_ORDER || tipo < _MIN_TYPE || tipo > _MAX_TYPE) {
         return;
     }
-    gC.orden = orden;
-    gC.periodo = periodo;
-    gC.tipo = tipo;
-    Escala.valor = pow(gC.periodo, -gC.orden);
-    Escala.aplicar = true;
+    _gC._orden = orden;
+    _gC._periodo = periodo;
+    _gC._tipo = tipo;
+    _Escala._valor = pow(_gC._periodo, -_gC._orden);
+    _Escala._aplicar = true;
 }
 
-void FractionalOrderFilter::gaussJordan(double* A, double* b, int N) {
+void FractionalOrderFilter::_gaussJordan(double* A, double* b, int N) {
     for (int i = 0; i < N; i++) {
         double pivot = A[i * N + i];
         for (int j = i; j < N; j++) {
@@ -33,44 +32,44 @@ void FractionalOrderFilter::gaussJordan(double* A, double* b, int N) {
     }
 }
 
-void FractionalOrderFilter::calcularMatriz(const MatrixParams& params) {
-    for (int i = 0; i < params.filas; i++) {
+void FractionalOrderFilter::_calcularMatriz(const _MatrixParams& params) {
+    for (int i = 0; i < params._filas; i++) {
         for (int j = 0; j <= i; j++) {
             double sumMatrix = 0.0;
             double sumResult = 0.0;
-            for (int k = params.inicio; k < params.fin; k++) {
-                double val_i = (k - i >= 0) ? params.g_o_h[k - i] : 0.0;
-                double val_j = (k - j >= 0) ? params.g_o_h[k - j] : 0.0;
+            for (int k = params._inicio; k < params._fin; k++) {
+                double val_i = (k - i >= 0) ? params._g_o_h[k - i] : 0.0;
+                double val_j = (k - j >= 0) ? params._g_o_h[k - j] : 0.0;
                 sumMatrix += val_i * val_j;
                 if (j == 0) {
-                    sumResult += val_i * (params.positivo ? params.h[k] : params.h[k + 1]);
+                    sumResult += val_i * (params._positivo ? params._h[k] : params._h[k + 1]);
                 }
             }
-            params.matriz[params.filas * i + j] = sumMatrix;
+            params._matriz[params._filas * i + j] = sumMatrix;
             if (i != j) {
-                params.matriz[params.filas * j + i] = sumMatrix;
+                params._matriz[params._filas * j + i] = sumMatrix;
             }
             if (j == 0) {
-                params.result[i] = (params.positivo ? sumResult : -sumResult);
+                params._result[i] = (params._positivo ? sumResult : -sumResult);
             }
         }
     }
 }
 
-void FractionalOrderFilter::ponerCeros(double* arreglo,int size){
-    std::fill(arreglo, arreglo + size, 0.0);
+void FractionalOrderFilter::_ponerCeros(double* array, int size){
+    std::fill(array, array + size, 0.0);
 }
 
-void FractionalOrderFilter::respuestaImpulso(int cantidad, double* resultado) {
+void FractionalOrderFilter::_respuestaImpulso(int cantidad, double* respuesta) {
     if (cantidad <= 0) {
         return;
     }
-    double k1 = pow(gC.tipo, -gC.orden);
-    double k2 = (1.0 - gC.tipo) / gC.tipo;
+    double k1 = pow(_gC._tipo, -_gC._orden);
+    double k2 = (1.0 - _gC._tipo) / _gC._tipo;
     double inv_k2 = 1/k2;
     double k2_power = 1.0;
-    double c1 = 1 + gC.orden;
-    double c2 = 1 - gC.orden;
+    double c1 = 1 + _gC._orden;
+    double c2 = 1 - _gC._orden;
     double EE1 = 1.0;
     double DD[cantidad];
     double EE[cantidad];
@@ -85,7 +84,7 @@ void FractionalOrderFilter::respuestaImpulso(int cantidad, double* resultado) {
             k2_power *= k2;
         }
         double sum = 0.0;
-        if (gC.tipo == 1){
+        if (_gC._tipo == 1){
             sum = EE[n];
         }else{
             double k2_local = k2_power;
@@ -94,18 +93,18 @@ void FractionalOrderFilter::respuestaImpulso(int cantidad, double* resultado) {
                 k2_local *=inv_k2;
             }
         }
-        resultado[n] =k1*sum*((Escala.aplicar == true) ? Escala.valor : 1);
+        respuesta[n] =k1*sum*((_Escala._aplicar == true) ? _Escala._valor : 1);
     }
 }
 
-void FractionalOrderFilter::Pade(double* num, int ordenNum, double* den, int ordenDen) {
-    Escala.aplicar = false;
+void FractionalOrderFilter::_Pade(double* num, int ordenNum, double* den, int ordenDen) {
+    _Escala._aplicar = false;
     double h[ordenNum + ordenDen + 1];
-    respuestaImpulso(ordenNum + ordenDen + 1, h);
-    Pade(h, num, ordenNum, den, ordenDen);
+    _respuestaImpulso(ordenNum + ordenDen + 1, h);
+    _Pade(h, num, ordenNum, den, ordenDen);
 }
 
-void FractionalOrderFilter::Pade(double* h, double* num, int ordenNum, double* den, int ordenDen) {
+void FractionalOrderFilter::_Pade(double* h, double* num, int ordenNum, double* den, int ordenDen) {
     double dH[ordenDen * ordenDen];
     for (int i = 0; i < ordenDen; i++) {
         for (int j = 0; j < ordenDen; j++) {
@@ -115,85 +114,82 @@ void FractionalOrderFilter::Pade(double* h, double* num, int ordenNum, double* d
     for (int i = 0; i < ordenDen; i++) {
         den[i] = -h[ordenNum + 1 + i];
     }
-    gaussJordan(dH,den,ordenDen);
-    //memmove(&den[1], den, ordenDen * sizeof(double));
+    _gaussJordan(dH,den,ordenDen);
     std::copy(den, den + ordenDen, &den[1]);
     den[0] = 1;
-    numPade(h,num,ordenNum,den,ordenDen);
+    _numPade(h,num,ordenNum,den,ordenDen);
 }
 
-void FractionalOrderFilter::numPade(double* h, double* num,double ordenNum,double* den,double ordenDen){
+void FractionalOrderFilter::_numPade(double* h, double* num,double ordenNum,double* den,double ordenDen){
     for (int n = 0; n <= ordenNum; n++) {
         int limite = (n < ordenDen) ? n : ordenDen;
         for (int k = 0; k <= limite; k++) {
             num[n] += den[k] * h[n - k];
         }
-       num[n] = num[n] * Escala.valor;
+       num[n] = num[n] * _Escala._valor;
     }
 }
 
-void FractionalOrderFilter::Shank(double* num, int ordenNum, double* den, int ordenDen, int cantidad) {
-    ponerCeros(num,ordenNum);
-    ponerCeros(den,ordenDen);
+void FractionalOrderFilter::_Shank(double* num, int ordenNum, double* den, int ordenDen, int cantidad) {
+    _ponerCeros(num,ordenNum);
+    _ponerCeros(den,ordenDen);
     if (cantidad<=ordenNum+ordenDen){
         return;
     }else if(cantidad == ordenNum+ordenDen +1){
-        Pade(num,ordenNum,den,ordenDen);
+        _Pade(num,ordenNum,den,ordenDen);
     }else{
-        Escala.aplicar = false;
-        double h[cantidad]={0.0};
-        respuestaImpulso(cantidad,h);
-        Shank(h, num, ordenNum, den, ordenDen,cantidad);
-        numPade(h, num, ordenNum, den, ordenDen);
+        _Escala._aplicar = false;
+        double h[cantidad];
+        _respuestaImpulso(cantidad,h);
+        _Shank(h, num, ordenNum, den, ordenDen,cantidad);
+        _numPade(h, num, ordenNum, den, ordenDen);
     }
 }
 
-void FractionalOrderFilter::Shank(double* h, double* num, int ordenNum, double* den, int ordenDen, int cantidad) {
+void FractionalOrderFilter::_Shank(double* h, double* num, int ordenNum, double* den, int ordenDen, int cantidad) {
     int sHTH = ordenDen * ordenDen;
     double HTH[sHTH];
-    ponerCeros(HTH,sHTH);
-    MatrixParams params = {HTH, h, h, ordenDen, ordenNum, cantidad - 1, den, false};
-    calcularMatriz(params);
-    gaussJordan(HTH, den, ordenDen);
-    //memmove(&den[1], den, ordenDen * sizeof(double));
+    _ponerCeros(HTH,sHTH);
+    _MatrixParams params = {HTH, h, h, ordenDen, ordenNum, cantidad - 1, den, false};
+    _calcularMatriz(params);
+    _gaussJordan(HTH, den, ordenDen);
     std::copy(den, den + ordenDen, &den[1]);
     den[0] = 1.0;
 }
 
 
-void FractionalOrderFilter::Prony(double* num, int ordenNum, double* den, int ordenDen, int cantidad) {
-    ponerCeros(num,ordenNum);
-    ponerCeros(den,ordenDen);
+void FractionalOrderFilter::_Prony(double* num, int ordenNum, double* den, int ordenDen, int cantidad) {
+    _ponerCeros(num,ordenNum);
+    _ponerCeros(den,ordenDen);
     if (cantidad<=ordenNum+ordenDen){
         return;
     }else if(cantidad == ordenNum+ordenDen +1){
-        Pade(num,ordenNum,den,ordenDen);
+        _Pade(num,ordenNum,den,ordenDen);
     }else{
-        Escala.aplicar = false;
+        _Escala._aplicar = false;
         double h[cantidad];
-        respuestaImpulso(cantidad, h);
-        Shank(h, num, ordenNum, den, ordenDen,cantidad);
-        Prony(h, num, ordenNum, den, ordenDen,cantidad);
-        numPade(h, num, ordenNum, den, -1);
+        _respuestaImpulso(cantidad, h);
+        _Shank(h, num, ordenNum, den, ordenDen,cantidad);
+        _Prony(h, num, ordenNum, den, ordenDen,cantidad);
+        _numPade(h, num, ordenNum, den, -1);
     }
 }
 
 
-void FractionalOrderFilter::Prony(double* h, double* num, int ordenNum, double* den, int ordenDen, int cantidad) {
+void FractionalOrderFilter::_Prony(double* h, double* num, int ordenNum, double* den, int ordenDen, int cantidad) {
     double g[cantidad];
-    g[0] = 0.0;
-    for (int n = 0; n < cantidad; n++) {
-        int limite = (n < ordenDen) ? n : ordenDen;
-        for (int k = 0; k <= limite; k++) {
+    g[0] = 1.0;  
+    for (int n = 1; n < cantidad; n++) {  
+        g[n] = 0.0; 
+        for (int k = 0; k <= ((n < ordenDen) ? n : ordenDen); k++) {
             g[n] -= den[k] * g[n - k];
         }
-        if (n==0)
-        g[n] += 1;
     }
+
     int sGTG = (ordenNum + 1) * (ordenNum + 1);
     double GTG[sGTG];
-    ponerCeros(GTG,sGTG);
-    MatrixParams params = {GTG, h, g, ordenNum + 1, 0, cantidad, num, true};
-    calcularMatriz(params);
-    gaussJordan(GTG, num, ordenNum + 1);
+    _ponerCeros(GTG,sGTG);
+    _MatrixParams params = {GTG, h, g, ordenNum + 1, 0, cantidad, num, true};
+    _calcularMatriz(params);
+    _gaussJordan(GTG, num, ordenNum + 1);
 }
