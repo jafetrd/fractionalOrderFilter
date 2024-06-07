@@ -30,15 +30,45 @@ Para hacer uso hay que agregarla al proyecto con:
   * tipo = 0.875 -> Al-Alaoui, se puede usar en ambos al ser una interpolación entre Euler y Tustin
 
 ## Métodos
-``` void _respuestaImpulso(int cantidad, double* respuesta);```: Asigna al array **respuesta** el numero de coeficientes de MacLaurin indicado por **cantidad**, cuando tipo=1 los coeficientes generados son los de la conocida definición de Grunwald - Letnikov.
+```C 
+void _respuestaImpulso(int cantidad, double* respuesta);
+```
+Asigna al array **respuesta** el numero de coeficientes de MacLaurin indicado por **cantidad**, cuando tipo=1 los coeficientes generados son los de la conocida definición de Grunwald - Letnikov.
 
-``` void _Pade(double* num, int ordenNum, double* den, int ordenDen);```: Asigna a los arrays **num** y **den** la cantidad de coeficientes mas uno, indicado por sus ordenes respectivos **ordenNum** y **ordenDen**, estos ordenes corresponden a los polinomios del numerador y denominador del filtro IIR $P_N^M(z^{-1})$ en el que serán usados. Internamente ejecuta el metodo **_respuestaImpulso** y mediante el método de Padé que extrae la mayor información posible de una serie de Taylor, genera los coeficientes. Es el menos costoso computacionalmente pero sin cota de error despues de ordenNum+ordenDen+1 valores generados por su respuesta impulso. 
+```C
+void _Pade(double* num, int ordenNum, double* den, int ordenDen);
+```
+Asigna a los arrays **num** y **den** la cantidad de coeficientes mas uno, indicado por sus ordenes respectivos **ordenNum** y **ordenDen**, estos ordenes corresponden a los polinomios del numerador y denominador del filtro IIR $P_N^M(z^{-1})$ en el que serán usados. Internamente ejecuta el metodo **_respuestaImpulso** y mediante el método de Padé que extrae la mayor información posible de una serie de Taylor, genera los coeficientes. Es el menos costoso computacionalmente pero sin cota de error despues de ordenNum+ordenDen+1 valores generados por su respuesta impulso. 
 
-```void _Shank(double* num, int ordenNum, double* den, int ordenDen, int cantidad);```: el parametro **cantidad** recibe la el numero de valores de la repuestaImpulso que serán tomado en cuenta para generar una minimización cuadratica que optimizará los coeficientes del denominador del filtro IIR, los coeficientes del numerador se generan son el método de Padé.
+```C
+void _Shank(double* num, int ordenNum, double* den, int ordenDen, int cantidad);
+```
+El parametro **cantidad** recibe la el numero de valores de la repuestaImpulso que serán tomado en cuenta para generar una minimización cuadratica que optimizará los coeficientes del denominador del filtro IIR, los coeficientes del numerador se generan son el método de Padé.
 
-```void _Prony(double* num, int ordenNum, double* den, int ordenDen, int cantidad);```: tanto los coeficientes del numerador como los del denominador son generados mediante una minimización cuadratica, representada como una pseudo inversa, es el mas costoso computacionalmente pero con mejores resultados. 
+```C
+void _Prony(double* num, int ordenNum, double* den, int ordenDen, int cantidad);
+```
+Tanto los coeficientes del numerador como los del denominador son generados mediante una minimización cuadratica, representada como una pseudo inversa, es el mas costoso computacionalmente pero con mejores resultados. 
 
-## Posibles problemas
+# Ejemplo de uso
+
+```C
+#include "fractionalOrderFilter.h"
+int main() {
+    // Definir un integrador de orden medio tipo Tustin 
+    //con un tiempo entre muestras de 0.01 segundos 
+    FractionalOrderFilter filter(-0.5, 0.01, 0.5);
+    // Aproximarlo para un filtro IIR de orden 9 tanto en el 
+    //numerador como el denominador tomando en cuenta 
+    //1000 coeficientes de la respuesta impulso
+    int ordenNum = 9, ordenDen = 9, cantidad = 1000;
+    double num2[ordenNum + 1], den[ordenDen + 1];
+    filter._Prony(num, ordenNum, den, ordenDen, cantidad);
+    return 0;
+}
+```
+
+# Posibles problemas
 
 Los tres metodos Padé, Shank y Prony son calculados usando el método de Gauss Jordan para resolver ecuaciones simultáneas y pueden surgir sistemas que no tengan solución, los métodos de Shank y Prony hacen uso de pseudoinversas las cuales para resolverlas se representan como un sistema lineal $A^T A x = A^T b$ y se resuelven para $x$ y solo tiene solución si $A^T A$ se pude convertir en una matriz unitaria mediante operaciones por renglones. Otro problema que surge es cuando los ordenes del numerador y denominador se asignan a valores mayores a 15, lo que se traduce a un sistema de ecuaciones simultaneas de 15 x 15, la acumulación de errores numéricos provoca que no se llegue a ningun resultado. 
 
