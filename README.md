@@ -62,7 +62,7 @@ int main() {
     //numerador como el denominador tomando en cuenta 
     //1000 coeficientes de la respuesta impulso
     int ordenNum = 9, ordenDen = 9, cantidad = 1000;
-    double num2[ordenNum + 1], den[ordenDen + 1];
+    double num[ordenNum + 1], den[ordenDen + 1];
     filter._Prony(num, ordenNum, den, ordenDen, cantidad);
     return 0;
 }
