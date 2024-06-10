@@ -2,6 +2,9 @@
 
 Esta librería realiza el cálculo de la respuesta impulso es decir los coeficientes de la serie de MacLaurin de un integrador sintonizable o de Smith elevado a una potencia real entre -1 y 1, haciendo variar un parametro de este, se obtienen las aproximaciones tipo Euler atrasado, Al-Alaoui y Tustin/bilineal que corresponde a la familia de aproximaciones discretas de primer orden para la integral o la derivada. A partir de estos coeficientes, que pueden ser usados para un filtro FIR, se generan los coeficientes para un filtro tipo IIR mediante tres métodos: Padé, Shank y Prony.
 
+### Ejecuta en linea 
+<https://onlinegdb.com/YrTfwFJxB>
+
 ## Características
 
 - **Aproximaciones de Primer Orden**:
