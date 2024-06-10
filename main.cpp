@@ -7,7 +7,7 @@ void _guardarVector(const std::string& filename, const double* data, int size) {
     std::ofstream file(filename);
     file << "{";
     for (int i = 0; i < size - 1; ++i) {
-        file << std::setprecision(15) << data[i] << ",";
+        file << std::setprecision(15) << data[i] << "," << std::endl;
     }
     file << std::setprecision(15) << data[size - 1] << "}";
 }
@@ -22,7 +22,7 @@ void _guardarCoeficientes(const std::string& filename, const double* num, int or
     }
     file << std::setprecision(15) << num[ordenNum] << "},{";
     for (int i = 0; i < ordenDen; ++i) {
-        file << std::setprecision(15) << den[i] << ",";
+        file << std::setprecision(15) << den[i] << "," << std::endl;
     }
     file << std::setprecision(15) << den[ordenDen] << "}}";
 }
