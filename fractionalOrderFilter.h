@@ -48,6 +48,7 @@ private:
     void _Shank(double* h, double* num, int ordenNum, double* den, int ordenDen, int cantidad);
     void _Prony(double* h, double* num, int ordenNum, double* den, int ordenDen, int cantidad);
     void _gaussJordan(double* A, double* b, int N);
+    void _swapRows(double* A, double* b, int N, int row1, int row2);
     void _calcularMatriz(const _MatrixParams& params);
     void _ponerCeros(double* array, int size);
 };
