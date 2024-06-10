@@ -72,7 +72,7 @@ int main() {
 
 Los tres metodos Padé, Shank y Prony son calculados usando el método de Gauss Jordan con pivoteo parcial para resolver ecuaciones simultáneas y pueden surgir sistemas que no tengan solución, los métodos de Shank y Prony hacen uso de pseudoinversas las cuales para resolverlas se representan como un sistema lineal $A^T A x = A^T b$ y se resuelven para $x$ y solo tiene solución si $A^T A$ se pude convertir en una matriz unitaria mediante operaciones por renglones. Otro problema que surge es cuando los ordenes del numerador y denominador se asignan a valores mayores a 15, lo que se traduce a un sistema de ecuaciones simultaneas de 15 x 15, la acumulación de errores numéricos provoca que no se llegue a ningun resultado. 
 
-#Recomendaciones 
+# Recomendaciones 
 Para integrales hacer uso del operador Tustin y para las derivadas el operador de Euler atrasado, son los que generan mejores resultados 
 
 # Contribuciones
