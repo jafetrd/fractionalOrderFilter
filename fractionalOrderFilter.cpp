@@ -13,8 +13,29 @@ FractionalOrderFilter::FractionalOrderFilter(double orden, double periodo, doubl
     _Escala._aplicar = true;
 }
 
+void FractionalOrderFilter::_swapRows(double* A, double* b, int N, int row1, int row2) {
+    if (row1 == row2) return;
+    for (int i = 0; i < N; i++) {
+        double temp = A[row1 * N + i];
+        A[row1 * N + i] = A[row2 * N + i];
+        A[row2 * N + i] = temp;
+    }
+    double temp = b[row1];
+    b[row1] = b[row2];
+    b[row2] = temp;
+}
+
 void FractionalOrderFilter::_gaussJordan(double* A, double* b, int N) {
     for (int i = 0; i < N; i++) {
+         // Pivoteo parcial
+        int maxRow = i;
+        for (int k = i + 1; k < N; k++) {
+            if (fabs(A[k * N + i]) > fabs(A[maxRow * N + i])) {
+                maxRow = k;
+            }
+        }
+        _swapRows(A, b, N, i, maxRow);
+         
         double pivot = A[i * N + i];
         for (int j = i; j < N; j++) {
             A[i * N + j] /= pivot;
